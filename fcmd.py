@@ -52,13 +52,13 @@ class FPrompt(Cmd):
             projects = self.projects
             project_names = [project['name'] for project in projects]
             if not text:
-                return map(str, project_names[:])
+                return project_names[:]
                 
             else:
-                return map(str, [
+                return [
                     project_name for project_name in project_names
                     if project_name.startswith(text)
-                ])
+                ]
 
         else:
             entities = self.children
