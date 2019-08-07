@@ -13,7 +13,7 @@ default_prompt = Fore.MAGENTA + 'ftrack: ' + Style.RESET_ALL
 
 class FPrompt(Cmd):
     prompt = default_prompt
-    intro = 'Welcome to ftrack shell!'
+    intro = Fore.GREEN + 'Welcome to ftrack shell!'+ Style.RESET_ALL
 
     @property
     def current(self):
