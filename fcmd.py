@@ -1,11 +1,16 @@
 from cmd import Cmd
 from ftrack_api import Session
+import colorama
+from colorama import Fore, Back, Style
+
 from pprint import pformat
 import logging
 
+colorama.init()
+
 
 class FPrompt(Cmd):
-    prompt = 'ftrack: '
+    prompt = Fore.MAGENTA + 'ftrack: ' + Style.RESET_ALL
     intro = 'Welcome to ftrack shell!'
 
     @property
@@ -93,11 +98,11 @@ class FPrompt(Cmd):
             ][0]
         
         if current is not None:
-            self.prompt = 'ftrack [{}:{}]: '.format(
+            self.prompt = Fore.MAGENTA + 'ftrack [{}:{}]: '.format(
                 current.entity_type, current['name']
-            )
+            )+ Style.RESET_ALL
         else:
-            self.prompt = 'ftrack: ' 
+            self.prompt = Fore.MAGENTA + 'ftrack: ' + Style.RESET_ALL
     
         self._current_entity = current
   
