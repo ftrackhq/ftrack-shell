@@ -8,9 +8,11 @@ import logging
 
 colorama.init()
 
+default_prompt = Fore.MAGENTA + 'ftrack: ' + Style.RESET_ALL
+
 
 class FPrompt(Cmd):
-    prompt = Fore.MAGENTA + 'ftrack: ' + Style.RESET_ALL
+    prompt = default_prompt
     intro = 'Welcome to ftrack shell!'
 
     @property
@@ -44,6 +46,12 @@ class FPrompt(Cmd):
         self._current_entity = None
         self._listed_entities = []
         self.logger = logging.getLogger(self.__class__.__name__)
+
+    def set_prompt(self, text=None):
+        if not text:
+            self.prompt = default_prompt
+        else:
+            self.prompt = Fore.MAGENTA + 'ftrack [{}]: '.format(text) + Style.RESET_ALL
 
     def do_ls(self, line):
         if not self.current:
@@ -89,8 +97,10 @@ class FPrompt(Cmd):
         raise SystemExit
 
     def do_cd(self, line):
+        current = None
         if line == '..':
-            current = self.parent
+            if self.current:
+                current = self.parent
         else:
             current = [
                 entity for entity in self._listed_entities
@@ -98,11 +108,11 @@ class FPrompt(Cmd):
             ][0]
         
         if current is not None:
-            self.prompt = Fore.MAGENTA + 'ftrack [{}:{}]: '.format(
-                current.entity_type, current['name']
-            )+ Style.RESET_ALL
+            self.set_prompt(
+                '{}:{}'.format(current.entity_type, current['name'])
+            )
         else:
-            self.prompt = Fore.MAGENTA + 'ftrack: ' + Style.RESET_ALL
+            self.set_prompt()
     
         self._current_entity = current
   
