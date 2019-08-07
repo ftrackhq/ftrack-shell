@@ -13,7 +13,7 @@ default_prompt = Fore.MAGENTA + 'ftrack: ' + Style.RESET_ALL
 
 class FPrompt(Cmd):
     prompt = default_prompt
-    intro = Fore.GREEN + 'Welcome to ftrack shell!'+ Style.RESET_ALL
+    intro = Fore.GREEN + 'Welcome to ftrack shell!' + Style.RESET_ALL
 
     @property
     def current(self):
@@ -54,6 +54,9 @@ class FPrompt(Cmd):
             self.prompt = Fore.MAGENTA + 'ftrack [{}]: '.format(text) + Style.RESET_ALL
 
     def do_ls(self, line):
+        if line == '-a':
+            print 'using advance formatting...'
+
         if not self.current:
             projects = self.projects
             project_names = [p['name'] for p in projects]
