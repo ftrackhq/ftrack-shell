@@ -6,6 +6,7 @@ import logging
 
 class FPrompt(Cmd):
     prompt = 'ftrack: '
+    intro = 'Welcome to ftrack shell!'
 
     @property
     def current(self):
@@ -15,6 +16,11 @@ class FPrompt(Cmd):
     def session(self):
         return self._session
     
+    @property
+    def parent(self):
+        parent = self.current['parent']
+        return parent
+
     @property
     def projects(self):
         projects = self.session.query('select name from Project').all()
@@ -33,14 +39,14 @@ class FPrompt(Cmd):
         self._current_entity = None
         self._listed_entities = []
         self.logger = logging.getLogger(self.__class__.__name__)
-    
+
     def do_ls(self, line):
         if not self.current:
             projects = self.projects
             project_names = [p['name'] for p in projects]
             for project_name in project_names:
                 print project_name
-        else:
+        else:    
             entities = self.children
             entity_names = [e['name'] for e in entities]
             for entity_name in entity_names:
@@ -78,10 +84,21 @@ class FPrompt(Cmd):
         raise SystemExit
 
     def do_cd(self, line):
-        current = [
-            entity for entity in self._listed_entities
-            if entity['name'] == line
-        ][0]
+        if line == '..':
+            current = self.parent
+        else:
+            current = [
+                entity for entity in self._listed_entities
+                if entity['name'] == line
+            ][0]
+        
+        if current is not None:
+            self.prompt = 'ftrack [{}:{}]: '.format(
+                current.entity_type, current['name']
+            )
+        else:
+            self.prompt = 'ftrack: ' 
+    
         self._current_entity = current
   
     def do_EOF(self, line):
@@ -91,4 +108,4 @@ if __name__ == '__main__':
     session = Session()
 
     prompt = FPrompt(session=session)
-    prompt.cmdloop('welcome to ftrack shell...')
+    prompt.cmdloop()
