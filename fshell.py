@@ -1,5 +1,5 @@
 from cmd import Cmd
-from ftrack_api import Session
+import ftrack_api
 import colorama
 from colorama import Fore, Back, Style
 
@@ -53,6 +53,26 @@ class FPrompt(Cmd):
             self.prompt = default_prompt
         else:
             self.prompt = Fore.MAGENTA + 'ftrack [{}]: '.format(text) + Style.RESET_ALL
+
+    def do_info(self, line):
+        if not line:
+            for k, v in self._current_entity.items():
+                if isinstance(v, ftrack_api.collection.Collection):
+                    v = list(v)
+        
+                print k, ':',  v
+
+        if line and line in self._current_entity:
+            v = self._current_entity[line]
+            if isinstance(v, ftrack_api.collection.Collection):
+                v = list(v)
+            print line, ':', v
+
+    def complete_info(self, text, line, start_index, end_index):
+        return [
+            key for key in self._current_entity.keys()
+            if key.startswith(text)
+        ]
 
     def do_ls(self, line):
         if not self.current:
@@ -125,7 +145,7 @@ class FPrompt(Cmd):
         return True
 
 if __name__ == '__main__':
-    session = Session()
+    session = ftrack_api.Session()
 
     prompt = FPrompt(session=session)
     prompt.cmdloop()
