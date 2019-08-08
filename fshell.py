@@ -11,8 +11,7 @@ colorama.init()
 default_prompt = Fore.MAGENTA + 'ftrack: ' + Style.RESET_ALL
 
 
-
-class FPrompt(Cmd):
+class FShell(Cmd):
     prompt = default_prompt
     intro = (Fore.GREEN + 'Welcome to ftrack shell!' + Style.RESET_ALL)
 
@@ -58,14 +57,21 @@ class FPrompt(Cmd):
         if not line:
             for k, v in self._current_entity.items():
                 if isinstance(v, ftrack_api.collection.Collection):
-                    v = list(v)
-        
+                    v = pformat(list(v))
+                
+                if isinstance(v, ftrack_api.collection.KeyValueMappedCollectionProxy):
+                    v = pformat(dict(v))
+
                 print k, ':',  v
 
         if line and line in self._current_entity:
             v = self._current_entity[line]
             if isinstance(v, ftrack_api.collection.Collection):
-                v = list(v)
+                v = pformat(list(v))
+            
+            if isinstance(v, ftrack_api.collection.KeyValueMappedCollectionProxy):
+                v = pformat(dict(v))
+                    
             print line, ':', v
 
     def complete_info(self, text, line, start_index, end_index):
@@ -147,5 +153,5 @@ class FPrompt(Cmd):
 if __name__ == '__main__':
     session = ftrack_api.Session()
 
-    prompt = FPrompt(session=session)
+    prompt = FShell(session=session)
     prompt.cmdloop()
