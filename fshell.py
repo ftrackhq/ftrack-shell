@@ -11,9 +11,10 @@ colorama.init()
 default_prompt = Fore.MAGENTA + 'ftrack: ' + Style.RESET_ALL
 
 
+
 class FPrompt(Cmd):
     prompt = default_prompt
-    intro = Fore.GREEN + 'Welcome to ftrack shell!' + Style.RESET_ALL
+    intro = (Fore.GREEN + 'Welcome to ftrack shell!' + Style.RESET_ALL)
 
     @property
     def current(self):
@@ -54,30 +55,29 @@ class FPrompt(Cmd):
             self.prompt = Fore.MAGENTA + 'ftrack [{}]: '.format(text) + Style.RESET_ALL
 
     def do_ls(self, line):
-        if line == '-a':
-            print 'using advance formatting...'
-
         if not self.current:
             projects = self.projects
-            project_names = [p['name'] for p in projects]
-            for project_name in project_names:
+            project_names = [(p['name'], p.entity_type) for p in projects]
+            for project_name, entity_type in project_names:
                 print project_name
+
         else:    
             entities = self.children
-            entity_names = [e['name'] for e in entities]
-            for entity_name in entity_names:
+            entity_names = [(e['name'], e.entity_type) for e in entities]
+            for entity_name, entity_type in entity_names:
                 print entity_name
 
     def complete_cd(self, text, line, start_index, end_index):
+        results = []
 
         if not self.current:
             projects = self.projects
             project_names = [project['name'] for project in projects]
             if not text:
-                return project_names[:]
+                results = project_names[:]
                 
             else:
-                return [
+                results = [
                     project_name for project_name in project_names
                     if project_name.startswith(text)
                 ]
@@ -86,13 +86,15 @@ class FPrompt(Cmd):
             entities = self.children
             entity_names = [entity['name'] for entity in entities]
             if not text:
-                return entity_names[:]
+                results = entity_names[:]
                 
             else:
-                return [
+                results = [
                     entity_name for entity_name in entity_names 
                     if entity_name.startswith(text)
                 ]
+    
+        return results
                 
     def do_quit(self, args):
         """Quits the program."""
